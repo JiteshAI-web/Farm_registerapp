@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Platform, SafeAreaView, useWindowDimensions, ScrollView, Alert, RefreshControl } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Platform, useWindowDimensions, ScrollView, Alert, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
@@ -53,7 +54,15 @@ export default function LoginScreen() {
         }),
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Non-JSON response from server:', responseText);
+        Alert.alert('Server Error', 'Received an invalid response from the server. Please check the backend.');
+        return;
+      }
       
       if (response.ok) {
         Alert.alert('Success', data.message || 'OTP sent successfully', [

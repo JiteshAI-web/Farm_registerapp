@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Image, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Alert, Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const [mobileNumber, setMobileNumber] = useState('');
@@ -34,7 +35,15 @@ export default function LoginScreen() {
         }),
       });
 
-      const responseData = await response.json();
+      const responseText = await response.text();
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Non-JSON response from server:', responseText);
+        Alert.alert('Server Error', 'Received an invalid response from the server. Please check the backend.');
+        return;
+      }
 
       if (response.ok && responseData.data) {
         Alert.alert('Success', 'Login successful!', [
